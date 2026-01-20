@@ -18,8 +18,8 @@ class Client:
 
                 sock.sendto(Client.HELLO_MSG, (Client.UDP_IP, Client.UDP_PORT))
 
-                screen = pygame.display.set_mode((800, 600))
-                pygame.display.set_mode((800, 600))
+                screen = pygame.display.set_mode((1000,600))
+
 
                 while self.running:
                     try:

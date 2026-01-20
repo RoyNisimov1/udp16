@@ -1,22 +1,34 @@
+import time
 from socket import socket
-
+from hashlib import sha256
 
 class Protocol:
 
 
     @staticmethod
     def send_files(s: socket, client: str, data: bytes, chunk_size: int = 1024):
-        sequence_number = 0
-        while len(data) != 0:
-            seqdata = data[:chunk_size]
-            data = data[chunk_size:]
+        hashed = sha256(data).hexdigest()
+        print(f"sending data with length: {len(data)}")
+        s.sendto(hashed.encode(), client)
+        for i in range(0, len(data), chunk_size):
+            chunk = data[i: i + chunk_size]
+            s.sendto(chunk, client)
+        s.sendto(b"EOF", client)
 
-            header = f"{sequence_number}|{len(seqdata)}|".encode('utf-8')
-
-            packet = header + seqdata
-
-
-
+    @staticmethod
+    def recv_files(s: socket, chunk_size: int = 1024) -> bytes:
+        hashed, address = s.recvfrom(64)
+        data = b""
+        while True:
+            packet, address = s.recvfrom(chunk_size)
+            if packet == b"EOF":
+                break
+            data+=packet
+        if (h:=sha256(data).hexdigest().encode()) != hashed:
+            print("Hashes don't match")
+            print(f"{hashed}")
+            print(f"{h}")
+        return data
 
 
 

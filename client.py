@@ -30,8 +30,8 @@ class Client:
                         try:
                             screenshot = Protocol.recv_files(sock, Client.BUFFER_SIZE)
                             image_stream = io.BytesIO(screenshot)
-                            img = pygame.image.load(image_stream, ".png").convert_alpha()
-                            screen.blit(img, (0,0))
+                            img = pygame.image.load(image_stream, ".jpeg").convert_alpha()
+                            screen.blit(img, (0, 0))
                         except:
                             ...
                         pygame.display.flip()

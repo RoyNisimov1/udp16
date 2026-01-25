@@ -2,6 +2,8 @@ import socket
 import threading
 import mss
 import mss.tools
+import io
+from PIL import Image
 
 from protocol import Protocol
 
@@ -43,11 +45,14 @@ class Server:
             try:
                 with mss.mss() as sct:
                     monitor = sct.monitors[1]
-                    screenshot = sct.grab(monitor)
-                    data = mss.tools.to_png(screenshot.rgb, screenshot.size)
+                    img = sct.grab(monitor)
+                    pil_img = Image.frombytes("RGB", img.size, img.bgra, "raw", "BGRX")
+                    byte_io = io.BytesIO()
+                    pil_img.save(byte_io, format="JPEG", quality=85)
+                    jpeg_bytes = byte_io.getvalue()
 
                 for client in self.clients:
-                    Protocol.send_files(s, client, data)
+                    Protocol.send_files(s, client, jpeg_bytes)
             except Exception:
                 ...
 
